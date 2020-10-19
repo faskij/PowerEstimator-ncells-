@@ -1,0 +1,82 @@
+The objective of this document is to create an easy to use script for estimating power based on an input sample size of cells. This package, "ncells," created by The Jackson Laboratory, is a calculation of the number of cells to identify a novel subpopulation in single cell RNA-seq experiment.
+
+
+```{r load libraries and package}
+library('devtools')
+install_github('TheJacksonLaboratory/ncells')
+library('ncells')
+```
+
+
+Arguments in 'ncells'
+function (m1, pi1, foldchange, dropout, p = 20000, n = seq(100, 
+                                                           1000, by = 100), mu = 1, sigma = 5, type1 = 0.05, dfactor, 
+          seed = 123, B = 1000, ncore = 1) 
+  
+  Example:
+  ncells(m1=1.6, pi1=5, fold change=4, dropout=.6, p=20000, mu=1, sigma=5)
+
+Argument descriptions (in order of the function):
+  'm' is the fraction of marker genes;  0.1 <= m <= 10.  
+'pi' is the percentage of sub population of cells in overall population; 5 <= pi <= 50.  
+'fc' is the expression fold change of desired sub population; 1 <= fc <= 32.  
+'do' is the dropout rate; 0.6 <= do <= 0.999.  
+'unique_gene_count' is the total number of unique genes in simulation; 10000 <= unique_gene_count.  
+'number_cells' is the vector of total number of cells one would like to examine power on; 50 <= min(number_cells), max(number_cells) <= 1000000.  
+'mean_expression' (default = 1).  
+'standard_deviation' of mean gene expressions (default = 5).  
+'alpha' is the type 1 error rate, default = 0.05.  
+'dfactor' is an option, Cutoff values to declare separation, depends on type 1 error rate.  
+'seed_number' is the pseudonumber vector, default 123.  
+'replicates' is the number of replicates to estiamte the probability of success separation, default 1000, 100 <= replicates.  
+'cores' is the number of cores in the simulation, default = 1.  
+
+```{r, define_arguments}
+frac_m_genes = 1
+percent_sub_pop = 10                   
+fold_ch = 2                  
+drop_rate =  0.6                  
+unique_gene_count = 10000 
+n_cells = 500
+mean_expression =  1.5       
+standard_deviation=  2    
+alpha = 0.05               
+dfactor=TRUE              
+seed_number = 123          
+replicates =  100         
+cores = 1                  
+```
+
+
+# This may take some time to run
+```{r, run function}
+
+ncells(m1 = frac_m_genes, pi1=percent_sub_pop, foldchange = fold_ch, dropout = drop_rate, p = unique_gene_count, n = n_cells, mu = mean_expression, sigma = standard_deviation, type1 = alpha, dfactor= TRUE, seed = seed_number, B = replicates, ncore = cores)
+
+```
+
+
+Estimate number of principal components in 2 population model.
+```{r components}
+ncomps(m1 = m, pi1 = pi, foldchange = fc, dropout = do, p=unique_gene_count, mu=mean_expression, sigma=standard_deviation, seed=seed_number)
+```
+
+```{r simulate}
+simulate(pfrac, nfrac, logfc, alpha, p, n, model, B, ncore)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
