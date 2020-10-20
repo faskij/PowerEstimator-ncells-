@@ -1,0 +1,29 @@
+```{r}
+library(RNASeqPower)
+```
+
+This calculation of sample size requires an input of:
+1) sequence depth, defined as the ratio of bases sequenced to the size of the genome.
+2) Biological coefficient of variation, within a group, cv = sd/mean.
+3) Effect size is the biological effect one would aim to detect (commonly 1.5 or 2)(same as mean fold change).
+4) Alpha, type 1 rate of error.
+5) Power one would like to achieve.
+
+
+```{r}
+depth = 20
+cv = 0.4
+cv2 = 0.4
+effect = c(1.25, 1.5, 1.75, 2)
+alpha = 0.05
+power = c(0.8, 0.9, 0.95)
+```
+
+
+```{r}
+samplesizes <- rnapower(depth=depth, cv=cv, cv2 = cv2, effect = effect,
+alpha= alpha, power=power)
+
+samplesizes
+```
+
