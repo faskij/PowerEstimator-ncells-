@@ -15,7 +15,8 @@ ui <- fluidPage(
       textInput('effect', 'Enter Mean Fold Changes (comma delimited)', "1.25,1.5,1.75,3"),
       sliderInput("alpha",  "Alpha",
                   min = 0.01, max = 0.99, value = 0.05),
-      numericInput("cv", "Coefficient of Variation (must be same for both groups)", value = 0.4),
+      numericInput("cv", "Coefficient of Variation (group 1)", value = 0.4),
+      numericInput("cv2", "Coefficient of Variation (group 2)", value = 0.4),
       numericInput("depth", "Sequencing Depth", value = 20),
     ),
     
@@ -35,7 +36,7 @@ server <- function(input, output) {
     power <- as.numeric(unlist(strsplit(input$power,",")))
     alpha <- as.numeric(input$alpha)
     
-    samplesizes <- rnapower(depth=input$depth, cv=input$cv, effect = effect,
+    samplesizes <- rnapower(depth=input$depth, cv=input$cv, cv2 = input$cv2, effect = effect,
                             alpha= alpha, power=power)
     
     samplesizes<-samplesizes%>%
