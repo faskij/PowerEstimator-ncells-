@@ -86,7 +86,7 @@ column(7,
       
       sliderInput("standard_deviation",
                   h5("Standard Deviation of Mean Expression"),
-                  min = 0.5, max = 10, value = 2),
+                  min = 0.5, max = 10, value = 1),
       
       sliderInput("alpha",  h5("Alpha"),
                   min = 0.01, max = 0.99, value = 0.05),
