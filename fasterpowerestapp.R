@@ -2,33 +2,38 @@ library(shiny)
 library(quantmod)
 library('devtools')
 library('ncells')
+library(readxl)
+library(tidyverse)
+
+data <- read_excel(here::here("data", "ncells-data.xlsx"))%>%
+  filter(!is.na(power))%>%
+  filter(!sigma == 1.7)
+
 # Define UI ----
 ui <- fluidPage(
   titlePanel(h1("Power Calculator for scRNA-seq Experiment")),
-  plotOutput("plot"),
+ 
   
   mainPanel( 
-    
+    plotOutput("plot"),
     h2("Power Estimate"),
     textOutput("n_cells"),
     textOutput("ncells")
     #tableOutput("ncells")
+   
   ),
+  
+ 
   
   sidebarPanel(
     
     h3("Parameter Input for Plot"),
     
-    
-    
     selectInput("fold_ch_plot",
                 h5("Fold Change of Sub Pop"),
-                
                 c("1.5" = 1.5,
                   "2" = 2)
     ),
-    
-    
     
     selectInput("mean_expression_plot",
                 h5("Mean Gene Expression"),
@@ -39,8 +44,6 @@ ui <- fluidPage(
                 h5("Standard Deviation of Mean Expression"),
                 c("1" = 1,
                   "1.5" = 1.5)),
-    
-    
   ),
   
   sidebarPanel(
@@ -64,7 +67,7 @@ column(5,
       
       sliderInput("fold_ch",
                   h5("Fold Change of Sub Pop"),
-                  min = 1, max = 10, value = 1, step = 0),
+                  min = 1, max = 10, value = 2, step = 0),
       
       numericInput("drop_rate",  h5("Drop out Rate"),
                   min = 0.6, max = 0.999, value = 0.6)
@@ -134,7 +137,9 @@ server <- function(input, output) {
       ggplot()+
       geom_line(mapping = aes(x = `frac_sub_pop (%)`, y = power, colour = n_cells))+
       ylim(c(0, 1))+
-      labs(title = "Plot of Power by Fraction of Sub-Population", x = "Fraction of Sub-Population", y = "Power", colour = "Sample Size")
+      labs(title = "Plot of Power by Fraction of Sub-Population", x = "Fraction of Sub-Population", y = "Power", colour = "Sample Size",
+           caption = "For this plot, the fraction of marker genes is held constant at 1%, dropout rate is held constant at 60%, 
+           \n alpha is held constant at 0.05, and number of unique genes included in the simulation is 17,000.")
     
   })
 
