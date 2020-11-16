@@ -1,7 +1,6 @@
 library(shiny)
 library(quantmod)
 library('devtools')
-library('devtools')
 
 # Define UI ----
 ui <- fluidPage(
@@ -44,9 +43,6 @@ ui <- fluidPage(
                    h5("Standard Deviation of Mean Expression"),
                    value = 2),
       
-      sliderInput("alpha",  h5("Alpha"),
-                  min = 0.01, max = 0.99, value = 0.05)
-      
     ),
     
     mainPanel( 
@@ -87,10 +83,9 @@ server <- function(input, output) {
     
     standard_deviation <- input$standard_deviation
     
-    alpha <- input$alpha
     
     powerEst <- ncells(m1 = frac_m_genes, pi1=percent_sub_pop, foldchange = fold_ch, dropout = drop_rate, p = unique_gene_count, n = n_cells, 
-                       mu = mean_expression, sigma = standard_deviation, type1 = alpha, dfactor= TRUE, seed = seed_number, B = replicates, ncore = cores)
+                       mu = mean_expression, sigma = standard_deviation, type1 = 0.05, dfactor= TRUE)
     
     paste("Power = ", powerEst)
   })

@@ -2,9 +2,11 @@ The objective of this document is to create an easy to use script for estimating
 
 
 ```{r load libraries and package}
-library('devtools')
-install_github('TheJacksonLaboratory/ncells')
-library('ncells')
+library(devtools)
+library(ncells)
+library(tidyverse)
+library(readxl)
+library(ggplot2)
 ```
 
 
@@ -17,7 +19,7 @@ function (m1, pi1, foldchange, dropout, p = 20000, n = seq(100,
   ncells(m1=1.6, pi1=5, fold change=4, dropout=.6, p=20000, mu=1, sigma=5)
 
 Argument descriptions (in order of the function):
-  'm' is the fraction of marker genes;  0.1 <= m <= 10.  
+'m' is the fraction of marker genes;  0.1 <= m <= 10.  
 'pi' is the percentage of sub population of cells in overall population; 5 <= pi <= 50.  
 'fc' is the expression fold change of desired sub population; 1 <= fc <= 32.  
 'do' is the dropout rate; 0.6 <= do <= 0.999.  
@@ -28,30 +30,41 @@ Argument descriptions (in order of the function):
 'alpha' is the type 1 error rate, default = 0.05.  
 'dfactor' is an option, Cutoff values to declare separation, depends on type 1 error rate.  
 'seed_number' is the pseudonumber vector, default 123.  
-'replicates' is the number of replicates to estiamte the probability of success separation, default 1000, 100 <= replicates.  
+'replicates' is the number of replicates to estiamte the probability of success separation, default 1000.  
 'cores' is the number of cores in the simulation, default = 1.  
 
 ```{r, define_arguments}
-frac_m_genes = 1
-percent_sub_pop = 10                   
-fold_ch = 2                  
-drop_rate =  0.6                  
-unique_gene_count = 10000 
-n_cells = 500
-mean_expression =  1.5       
-standard_deviation=  2    
-alpha = 0.05               
-dfactor=TRUE              
-seed_number = 123          
-replicates =  100         
-cores = 1                  
+frac_m_genes = 1 
+percent_sub_pop =5
+fold_ch = 1.5
+drop_rate =  0.6
+unique_gene_count = 17000
+n_cells = 200
+mean_expression =  1.5
+standard_deviation=  1.5
 ```
 
 
 # This may take some time to run
 ```{r, run function}
+pb <- txtProgressBar(min = 0, max = length(percent_sub_pop), initial = 0)
 
-ncells(m1 = frac_m_genes, pi1=percent_sub_pop, foldchange = fold_ch, dropout = drop_rate, p = unique_gene_count, n = n_cells, mu = mean_expression, sigma = standard_deviation, type1 = alpha, dfactor= TRUE, seed = seed_number, B = replicates, ncore = cores)
+power_for_loop <- tibble(value = c(1:50))
+power_for_loop$power <- -99
+
+for (val in percent_sub_pop){
+row <- ncells(m1 = frac_m_genes, pi1=val, foldchange = fold_ch, dropout = drop_rate, p = unique_gene_count, n = n_cells, mu = mean_expression, sigma = standard_deviation, dfactor= T, B = 500)
+
+num <- unname(row)
+
+power_for_loop$power[val] <- num[[1]]
+
+setTxtProgressBar(pb,val)
+}
+
+power_for_loop%>%
+  filter(!power == "-99")%>%
+  arrange(desc(value))
 
 ```
 
@@ -67,6 +80,21 @@ simulate(pfrac, nfrac, logfc, alpha, p, n, model, B, ncore)
 
 
 
+```{r, plot}
+data <- read_excel(here::here("data", "ncells-data.xlsx"))%>%
+  filter(!is.na(power))
+
+data%>%
+  filter(mu == 1)%>%
+  filter(sigma == 1)%>%
+  filter(fold_change == 2)%>%
+  mutate(n_cells = as.character(n_cells))%>%
+ggplot()+
+  geom_line(mapping = aes(x = `frac_sub_pop (%)`, y = power, colour = n_cells))+
+  ylim(c(0, 1))
+
+
+```
 
 
 
