@@ -14,6 +14,7 @@ data <- readRDS("data/plot_data.rds")
 
 # Define UI ----
 ui <- fluidPage(
+  useShinyjs(),
   titlePanel(h1("Power Calculator for scRNA-seq Experiment")),
   
   add_busy_spinner(spin = "fading-circle"),
@@ -111,32 +112,42 @@ ui <- fluidPage(
 
 # Define server logic ----
 server <- function(input, output) {
-
   
   
-  size_reaction <- eventReactive( input$go,  
+  
+  
+size_reaction <- eventReactive( input$go,  
     
     paste("You have selected a sample size of", input$n_cells)
     )
     
-  output$n_cells <- renderText({
+output$n_cells <- renderText({
     size_reaction()
   })
   
+observeEvent(input$go,{
+  disable("go")
+  paste("Power = ", as.numeric(power_reaction()))
+  enable("go")
+  
+})
 
-  power_reaction <- eventReactive(input$go,
+power_reaction <- eventReactive(input$go,
+                                  
     powerEst <- ncells(m1 = input$frac_m_genes, pi1=input$percent_sub_pop, foldchange = input$fold_ch, dropout = input$drop_rate, 
     p = input$unique_gene_count, n = input$n_cells, mu = input$mean_expression, sigma = input$standard_deviation, type1 = input$alpha, dfactor= T, B = 100)
   
-    
-                                  )
+                                 )
  
-  output$ncells <- renderText({
+  
+output$ncells <- renderText({
     
     paste("Power = ", as.numeric(power_reaction()))
   
   })
   
+
+
  
   output$plot <- renderPlot({
     
