@@ -3,7 +3,6 @@
 library(shiny)
 library(shinyjs)
 library(shinybusy)
-library(shinybusy)
 library(quantmod)
 library('devtools')
 library('ncells')
